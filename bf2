@@ -1,0 +1,81 @@
+#!/usr/bin/env perl
+use Mojolicious::Lite;
+
+# remember to add the following to your hosts-file
+# 127.0.0.1 bf2web.gamespy.com
+
+use lib '.';
+use Unlocks;
+use English;
+use Tie::File::AsHash;
+
+my $path;
+
+if ($OSNAME eq 'linux') {
+  $path = '/var/bf2unlocks/';
+}
+elsif ($OSNAME eq 'MSWin32') {
+  $path = "C:\\WINDOWS\\TEMP\\bf2unlocks\\";
+}
+
+if( !-d $path ) {
+  mkdir $path;
+}
+
+tie my %pids, 'Tie::File::AsHash', $path . "bf2pids", split => ':' or die "Problem tying %hash: $!";
+
+get '/ASP/getunlocksinfo' => sub {
+  my $self = shift;
+
+  my $pid = $self->param('pid');
+  
+  my ($body, $u);
+  if( exists $pids{$pid} ) {
+    $self->app->log->info("We got pid: [$pid], it was cached!");
+    $u = Unlocks->cached($pid, $pids{$pid} );
+  }
+  else {
+    $self->app->log->info("We got pid: [$pid].");
+    my $response = $self->ua->get("69.10.24.134/ASP/getunlocksinfo.aspx?pid=$pid" => { Host => 'bf2web.gamespy.com' });
+    $body = $response->res->body;
+    $u = Unlocks->new($body);
+    $pids{$pid} = $u->nick;
+  }
+
+  $body = $u->stringify;
+
+  $self->res->headers->content_type('text/html; charset=utf-8');
+  $self->res->body($body);
+  $self->res->fix_headers;
+  $self->res->headers->header('Cache-Control' => 'private');
+  $self->res->headers->header('Server' => 'Microsoft-IIS/6.0');
+  $self->res->headers->header('X-AspNet-Version' => '2.0.50727');
+  $self->res->headers->header('X-Powered-By' => 'ASP.NET');
+  $self->res->headers->header('cluster-server' => 'gstpsprdweb08');
+  $self->res->headers->header('p3p' => "CP='NOI ADMa OUR STP'");
+
+  $self->write( $body );
+#  $self->res->headers->remove('Connection'); # does not work :(
+  $self->finish();
+};
+
+
+# next route is only necessary if you dont run a dedicated server
+
+get '/*uniqueblah' => sub {
+  my $self = shift;
+  my $all = $self->param('uniqueblah');
+  use Data::Dumper;
+  my @params = $self->param;
+  my $params;
+  foreach my $param (@params) {
+    next if $param eq 'uniqueblah';
+    $params .= "$param=" . $self->param($param) . "&";
+  }
+  my $path = "69.10.24.134/$all?$params";
+  $self->app->log->debug("Irrelevant URL. Forwarding to $all.");
+  my$response = $self->ua->get($path => { Host => 'bf2web.gamespy.com' });
+  $self->render(text => $response->res->body);
+};
+
+app->start;
