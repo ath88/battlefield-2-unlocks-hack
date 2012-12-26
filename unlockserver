@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sudo perl unlockproxy.pl daemon -m production --listen 'http://*:80';
