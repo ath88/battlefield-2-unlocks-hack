@@ -1,48 +1,20 @@
 #!/usr/bin/env perl
 use Mojolicious::Lite;
+use lib '.';
+use English;
 
 # remember to add the following to your hosts-file
 # 127.0.0.1 bf2web.gamespy.com
 
-use lib '.';
-use Unlocks;
-use English;
-use Tie::File::AsHash;
-
-my $path;
-
-if ($OSNAME eq 'linux') {
-  $path = '/var/bf2unlocks/';
-}
-elsif ($OSNAME eq 'MSWin32') {
-  $path = "C:\\WINDOWS\\TEMP\\bf2unlocks\\";
-}
-
-if( !-d $path ) {
-  mkdir $path;
-}
-
-tie my %pids, 'Tie::File::AsHash', $path . "bf2pids", split => ':' or die "Problem tying %hash: $!";
+app->secret('secretbf2hackedserverxor');
 
 get '/ASP/getunlocksinfo' => sub {
   my $self = shift;
-
   my $pid = $self->param('pid');
-  
-  my ($body, $u);
-  if( exists $pids{$pid} ) {
-    $self->app->log->info("We got pid: [$pid], it was cached!");
-    $u = Unlocks->cached($pid, $pids{$pid} );
-  }
-  else {
-    $self->app->log->info("We got pid: [$pid].");
-    my $response = $self->ua->get("69.10.24.134/ASP/getunlocksinfo.aspx?pid=$pid" => { Host => 'bf2web.gamespy.com' });
-    $body = $response->res->body;
-    $u = Unlocks->new($body);
-    $pids{$pid} = $u->nick;
-  }
+  my $body;
 
-  $body = $u->stringify;
+  $self->app->log->info("Request made for pid: [$pid]");
+  $body = stringify($pid);
 
   $self->res->headers->content_type('text/html; charset=utf-8');
   $self->res->body($body);
@@ -55,17 +27,13 @@ get '/ASP/getunlocksinfo' => sub {
   $self->res->headers->header('p3p' => "CP='NOI ADMa OUR STP'");
 
   $self->write( $body );
-#  $self->res->headers->remove('Connection'); # does not work :(
   $self->finish();
 };
 
-
 # next route is only necessary if you dont run a dedicated server
-
 get '/*uniqueblah' => sub {
   my $self = shift;
   my $all = $self->param('uniqueblah');
-  use Data::Dumper;
   my @params = $self->param;
   my $params;
   foreach my $param (@params) {
@@ -74,8 +42,51 @@ get '/*uniqueblah' => sub {
   }
   my $path = "69.10.24.134/$all?$params";
   $self->app->log->debug("Irrelevant URL. Forwarding to $all.");
-  my$response = $self->ua->get($path => { Host => 'bf2web.gamespy.com' });
+  my $response = $self->ua->get($path => { Host => 'bf2web.gamespy.com' });
   $self->render(text => $response->res->body);
 };
 
 app->start;
+
+
+sub stringify {
+  my $pid = shift;
+  my $epoch = time();
+
+  my $string = "O\n";
+  $string .= "H\tpid\tnick\tasof\n";
+  $string .= "D\t$pid\tsomeone\t$epoch\n";
+  $string .= "H\tenlisted\tofficer\n";
+  $string .= "D\t0\t0\n";
+  $string .= "H\tid\tstate\n";
+  $string .= "D\t11\ts\n";
+  $string .= "D\t22\ts\n";
+  $string .= "D\t33\ts\n";
+  $string .= "D\t44\ts\n";
+  $string .= "D\t55\ts\n";
+  $string .= "D\t66\ts\n";
+  $string .= "D\t77\ts\n";
+  $string .= "D\t88\ts\n";
+  $string .= "D\t99\ts\n";
+  $string .= "D\t111\ts\n";
+  $string .= "D\t222\ts\n";
+  $string .= "D\t333\ts\n";
+  $string .= "D\t444\ts\n";
+  $string .= "D\t555\ts\n";
+
+  my $length = chars($string);
+  
+  $string .= "\$\t$length\t\$\n"; 
+  return $string;
+}
+
+sub chars {
+  my ($string) = @_;
+ 
+  $string =~ s/\t//g;
+  $string =~ s/\n//g;
+  return length($string);
+}
+
+
+1;
