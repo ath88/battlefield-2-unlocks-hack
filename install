@@ -6,15 +6,27 @@ SHA256="b5afe6602280b99797b46389f3cd582bbfe212e7402c8b009b72e6ae41e8d435  $FILE"
 ALTEREDSHA256="3ee58e4f490f3bd81f15796e6364441a16ebd3b03ad78b42649ddc6f397bdd08  $FILE";
 ALREADYALTERED='n';
 
+echo -e "Installing the unlock patched Battlefield 2 Dedicated Server."
+
+if [ -f $FILE ];
+then 
+  FILESIZE=$(stat -c%s "$FILE")
+  if [[ $FILESIZE -lt '330900000' ]];
+  then
+    echo -e "Partially installed file found. Attempting redownload.";
+    wget -c $URL;
+  fi
+fi
+
 if [ ! -f $FILE ];
 then
-  echo -e "\nServer installer not found, downloading.";
+  echo -e "Server installer not found, downloading.";
   wget $URL;
 fi
 
 if [ ! -f $FILE ];
 then
-  echo -e "\nFile download failed. Exiting.";
+  echo -e "File download failed. Exiting.";
   exit 1;
 fi 
 
@@ -24,8 +36,7 @@ if [[ $SHA256SUM != $SHA256 ]];
 then 
   if [[ $SHA256SUM != $ALTEREDSHA256 ]];
   then
-    echo -e "\nSHA256 sums mismatch! May need to redownload.";
-    #TODO redownload
+    echo -e "SHA256 sums mismatch! Delete the one you have, and rerun this script.";
     exit 1;
   fi
 fi
@@ -35,7 +46,7 @@ then
   ALREADYALTERED='y'
 fi
 
-echo -e "\nInstaller located and verified. Patching installer.";
+echo -e "Installer located and verified. Patching installer.";
 
 if [[ $ALREADYALTERED == 'n' ]];
 then 
@@ -50,7 +61,7 @@ then
   exit 1;
 fi
 
-echo -e "Need sudo rights to add entry into /etc/hosts. Do you want an entry? [y/n]\nNote: You need this for the unlock server to work."
+echo -e "Need sudo rights to add entry into /etc/hosts. You need this for the unlock server to work.\nDo you want the entry? [y/n]"
 while true;
 do
   read yn
