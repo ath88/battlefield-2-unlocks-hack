@@ -1,4 +1,4 @@
-Battlefield-2-Unlocks
+Battlefield 2 Unlocks hack
 =====================
 
 Server software for 'cheating' a local Battlefield 2 server to allow all weapons unlocked for all players.
