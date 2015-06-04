@@ -1,13 +1,13 @@
 Battlefield 2 Unlocks hack
 =====================
 
-IMPORTANT NOTICE START
+<b>IMPORTANT NOTICE START</b>
 
 Since the Gamespy shutdown of their Battlefield 2 servers, <b>this solution no longer works</b>. I will keep the repository open until I can confirm that the code wont ever be useful again. There is a interesting project over at battlelog.co, but I am uncertain whether it will allow you to setup servers with all unlocks enabled.
 
 If anyone figures this out, please tell me!
 
-IMPORTANT NOTICE END
+<b>IMPORTANT NOTICE END</b>
 
 
 Server software for 'cheating' a local Battlefield 2 server to allow all weapons unlocked for all players.
