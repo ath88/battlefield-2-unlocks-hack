@@ -3,9 +3,11 @@ Battlefield 2 Unlocks hack
 
 <b>IMPORTANT NOTICE START</b>
 
-Since the Gamespy shutdown of their Battlefield 2 servers, <b>this solution no longer works</b>. I will keep the repository open until I can confirm that the code wont ever be useful again. There is a interesting project over at battlelog.co, but I am uncertain whether it will allow you to setup servers with all unlocks enabled.
+Since Gamespy's shutdown of their Battlefield 2 servers, on the 31st of May 2014, <b>this solution no longer works</b> [1]. I will keep the repository open until I can confirm that the code wont ever be useful again. There is a interesting project over at battlelog.co, but I am uncertain whether it will allow you to setup servers with all unlocks enabled.
 
 If anyone figures this out, please tell me!
+
+[1] http://www.reddit.com/r/Games/comments/22fz75/list_of_games_affected_by_gamespy_shutdown
 
 <b>IMPORTANT NOTICE END</b>
 
